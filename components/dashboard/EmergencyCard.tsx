@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Clock, Users, Hash, ChevronDown, Send, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -61,7 +61,14 @@ const STATUSES: Status[] = ["unassigned", "dispatched", "in-progress", "resolved
 
 export function EmergencyCard({ emergency }: EmergencyCardProps) {
   const [status, setStatus] = useState<Status>(emergency.status)
+  const [elapsed, setElapsed] = useState<string | null>(null)
   const cfg = PRIORITY_CONFIG[emergency.priority]
+
+  useEffect(() => {
+    setElapsed(getElapsed(emergency.reportedAt))
+    const id = setInterval(() => setElapsed(getElapsed(emergency.reportedAt)), 30000)
+    return () => clearInterval(id)
+  }, [emergency.reportedAt])
 
   return (
     <article
@@ -100,7 +107,7 @@ export function EmergencyCard({ emergency }: EmergencyCardProps) {
         </span>
         <span className="flex items-center gap-1">
           <Clock className="h-3 w-3" />
-          {getElapsed(emergency.reportedAt)}
+          {elapsed ?? "—"}
         </span>
         <span className="flex items-center gap-1">
           <Hash className="h-3 w-3" />
