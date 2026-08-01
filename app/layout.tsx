@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ReliefMap — Triage Processor',
-  description: 'Emergency triage processing system — submit WhatsApp transcripts and generate structured reports.',
+  title: 'ReliefMap — Emergency Operations Center',
+  description: 'Real-time emergency management dashboard for dispatch operators.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -39,8 +39,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
-      <body className="antialiased">
+    <html lang="en" className="bg-background h-full" suppressHydrationWarning>
+      <body className="antialiased h-full">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
