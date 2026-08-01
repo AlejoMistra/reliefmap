@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { ListFilter, ChevronDown, X } from "lucide-react"
 import { EMERGENCIES, PRIORITY_ORDER, STATUS_LABELS } from "@/lib/emergencies"
-import type { Priority, Status } from "@/lib/emergencies"
+import type { Emergency, Priority, Status } from "@/lib/emergencies"
 import { EmergencyCard } from "./EmergencyCard"
 import { Button } from "@/components/ui/button"
 import {
@@ -31,7 +31,26 @@ export function EmergencyFeed() {
   const [priorityFilter, setPriorityFilter] = useState<Priority | null>(null)
   const [statusFilter, setStatusFilter] = useState<Status | null>(null)
 
-  const filtered = [...EMERGENCIES]
+  // Local status overrides — keyed by emergency id.
+  // When the DB is integrated, remove this map and derive status from server data instead.
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, Status>>({})
+
+  /**
+   * Called by EmergencyCard after the user confirms a status change.
+   * TODO: replace the local-only update with a real server action / API call here.
+   */
+  async function handleStatusChange(emergencyId: string, newStatus: Status) {
+    // Simulated async DB write — swap this for your real integration:
+    // await updateEmergencyStatus(emergencyId, newStatus)
+    setStatusOverrides((prev) => ({ ...prev, [emergencyId]: newStatus }))
+  }
+
+  // Merge overrides into the base data so filters see the updated statuses
+  const emergenciesWithOverrides: Emergency[] = EMERGENCIES.map((e) =>
+    statusOverrides[e.id] ? { ...e, status: statusOverrides[e.id] } : e
+  )
+
+  const filtered = [...emergenciesWithOverrides]
     .filter((e) => (priorityFilter ? e.priority === priorityFilter : true))
     .filter((e) => (statusFilter ? e.status === statusFilter : true))
     .sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
@@ -165,7 +184,11 @@ export function EmergencyFeed() {
         ) : (
           <div className="flex flex-col gap-2.5">
             {filtered.map((emergency) => (
-              <EmergencyCard key={emergency.id} emergency={emergency} />
+              <EmergencyCard
+                key={emergency.id}
+                emergency={emergency}
+                onStatusChange={handleStatusChange}
+              />
             ))}
           </div>
         )}
