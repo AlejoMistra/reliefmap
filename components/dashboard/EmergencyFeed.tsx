@@ -29,7 +29,7 @@ function reportToEmergency(r: EmergencyReport): Emergency {
     id:             r.id,
     title:          r.title,
     location:       r.location_text,
-    description:    r.situation_summary ?? r.reason,
+    description:    r.reason,
     priority:       COLOR_TO_PRIORITY[r.risk_color],
     triageLevel:    r.risk_level as 1 | 2 | 3 | 4 | 5,
     reason:         r.reason,
