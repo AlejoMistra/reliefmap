@@ -153,7 +153,10 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
           </Button>
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="h-7 gap-1 text-[11px] px-2 border rounded-md inline-flex items-center justify-center font-medium hover:bg-accent hover:text-accent-foreground">
+            <DropdownMenuTrigger
+              className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-background px-2 text-[11px] font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+              disabled={isUpdating}
+            >
               {isUpdating ? (
                 <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
@@ -197,7 +200,7 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
         {showReportModal && (
           <div className="mt-2 p-3 bg-zinc-950 rounded-md border border-red-500/30 text-zinc-100 font-mono text-[11px] space-y-1">
             <div className="flex items-center justify-between text-xs font-bold text-red-400 mb-1 border-b border-zinc-800 pb-1">
-              <span>🚨 REPORTE GENERADO POR AGENTE 2</span>
+              <span>REPORTE GENERADO POR AGENTE 2</span>
               <button
                 onClick={() => setShowReportModal(false)}
                 className="text-zinc-400 hover:text-white"
@@ -207,7 +210,7 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
             </div>
             <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-zinc-200">
               {emergency.formattedReport ||
-                `🚨 REPORTE DE EMERGENCIA
+                `REPORTE DE EMERGENCIA
 
 - Nombre y Apellido: ${emergency.informantName || "Informante Kapso"}
 - Título de la Descripción: ${emergency.title}
