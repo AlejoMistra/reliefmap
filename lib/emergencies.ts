@@ -21,7 +21,7 @@ export const EMERGENCIES: Emergency[] = [
       "Analisis de IA indica un choque multiple de 4 vehiculos bloqueando dos carriles. Se reporta posible fuga de combustible. Al menos 3 personas con lesiones aparentes segun imagenes.",
     priority: "critical",
     affectedPeople: 11,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 4),
+    reportedAt: new Date("2026-08-01T15:39:00Z"),
     status: "unassigned",
   },
   {
@@ -32,7 +32,7 @@ export const EMERGENCIES: Emergency[] = [
       "Modelo de IA detecta incendio activo en el segundo piso de una vivienda de dos plantas. La densidad de humo indica propagacion rapida. Se recomienda evacuar las unidades adyacentes.",
     priority: "critical",
     affectedPeople: 6,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 7),
+    reportedAt: new Date("2026-08-01T15:36:00Z"),
     status: "dispatched",
   },
   {
@@ -43,7 +43,7 @@ export const EMERGENCIES: Emergency[] = [
       "El sensor del Rio Kern supero el umbral de 2.4m. El modelo de IA proyecta inundacion de zonas residenciales bajas en 45 minutos.",
     priority: "critical",
     affectedPeople: 340,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 12),
+    reportedAt: new Date("2026-08-01T15:31:00Z"),
     status: "in-progress",
   },
   {
@@ -54,7 +54,7 @@ export const EMERGENCIES: Emergency[] = [
       "Red de sensores detecto concentracion de metano a 2.1 veces el umbral seguro. Clasificacion IA: alto riesgo, peligro potencial de ignicion. Se aconseja evacuar 100m a la redonda.",
     priority: "high",
     affectedPeople: 55,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 18),
+    reportedAt: new Date("2026-08-01T15:25:00Z"),
     status: "unassigned",
   },
   {
@@ -65,7 +65,7 @@ export const EMERGENCIES: Emergency[] = [
       "Reporte de adulto masculino inconsciente, aproximadamente 60 anos. RCP por transeuntes en curso. DEA disponible en escena. Puntuacion de gravedad IA: 9.1/10.",
     priority: "high",
     affectedPeople: 1,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 22),
+    reportedAt: new Date("2026-08-01T15:21:00Z"),
     status: "dispatched",
   },
   {
@@ -76,7 +76,7 @@ export const EMERGENCIES: Emergency[] = [
       "Cable electrico derribado por tormenta. Modelo de IA confirma riesgo de corriente activa. Interrupcion del trafico en dos intersecciones. Sin victimas reportadas.",
     priority: "high",
     affectedPeople: 0,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 35),
+    reportedAt: new Date("2026-08-01T15:08:00Z"),
     status: "in-progress",
   },
   {
@@ -87,7 +87,7 @@ export const EMERGENCIES: Emergency[] = [
       "Sensores ambientales detectaron ruptura menor de contenedor quimico. Clasificacion IA: baja volatilidad, no aereo. Respuesta del equipo de contencion adecuada.",
     priority: "medium",
     affectedPeople: 4,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 48),
+    reportedAt: new Date("2026-08-01T14:55:00Z"),
     status: "in-progress",
   },
   {
@@ -98,7 +98,7 @@ export const EMERGENCIES: Emergency[] = [
       "Fallo total de semaforos en interseccion de alto trafico. Se recomienda control manual o despliegue de agentes para prevenir incidentes secundarios.",
     priority: "medium",
     affectedPeople: 0,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 55),
+    reportedAt: new Date("2026-08-01T14:48:00Z"),
     status: "unassigned",
   },
   {
@@ -109,7 +109,7 @@ export const EMERGENCIES: Emergency[] = [
       "Menor de aproximadamente 7 anos reportado desaparecido por su tutor. Visto por ultima vez cerca del area de comidas. Revision de CCTV iniciada.",
     priority: "medium",
     affectedPeople: 1,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 62),
+    reportedAt: new Date("2026-08-01T14:41:00Z"),
     status: "dispatched",
   },
   {
@@ -120,7 +120,7 @@ export const EMERGENCIES: Emergency[] = [
       "Colision leve sin lesionados. Ambos conductores presentes en el lugar. Reporte policial solicitado para tramite de seguro.",
     priority: "low",
     affectedPeople: 2,
-    reportedAt: new Date(Date.now() - 1000 * 60 * 90),
+    reportedAt: new Date("2026-08-01T14:13:00Z"),
     status: "resolved",
   },
 ]
