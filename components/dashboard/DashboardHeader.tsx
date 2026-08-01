@@ -5,13 +5,19 @@ import useSWR from "swr"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { AlertTriangle, Radio, ShieldAlert, LayoutDashboard, Boxes } from "lucide-react"
-import type { EmergencyReport } from "@/lib/triage/schema"
 
 const fetcher = (url: string) =>
   fetch(url).then((r) => {
     if (!r.ok) throw new Error("failed")
     return r.json()
   })
+
+interface ReportStats {
+  active:     number
+  unassigned: number
+  critical:   number
+  high:       number
+}
 
 const NAV_ITEMS = [
   { href: "/",         label: "Dashboard",  icon: LayoutDashboard },
@@ -28,16 +34,15 @@ export function DashboardHeader() {
     return () => clearInterval(id)
   }, [])
 
-  const { data } = useSWR<{ reports: EmergencyReport[] }>(
-    "/api/reports?limit=200",
+  const { data: stats } = useSWR<ReportStats>(
+    "/api/reports/stats",
     fetcher,
-    { refreshInterval: 30_000 },
+    { refreshInterval: 15_000 },
   )
 
-  const reports   = data?.reports ?? []
-  const active    = reports.filter((r) => r.is_active).length
-  const unassigned = reports.filter((r) => r.is_active).length  // all active = unassigned from header POV
-  const critical  = reports.filter((r) => r.risk_color === "RED" && r.is_active).length
+  const active     = stats?.active     ?? 0
+  const unassigned = stats?.unassigned ?? 0
+  const critical   = stats?.critical   ?? 0
 
   const dateStr = now
     ? now.toLocaleDateString("es-ES", {
