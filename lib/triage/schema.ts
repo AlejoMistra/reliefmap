@@ -16,12 +16,12 @@ export const Agent1Payload = z.object({
   description: z.string().min(1, 'description is required'),
   /** Number of people affected — mandatory */
   people_affected: z.number().int().min(0, 'people_affected must be 0 or more'),
+  /** Human-readable address or landmark — mandatory */
+  location_text: z.string().min(1, 'location_text is required'),
 
   // ── Optional supplementary fields ───────────────────────────────────────────
   /** Full name as stated by the reporter */
   full_name: z.string().min(1).optional(),
-  /** Human-readable address or landmark provided by the reporter */
-  location_text: z.string().optional(),
   /** GPS latitude if the WhatsApp bot captured the reporter's location pin */
   latitude: z.number().optional(),
   /** GPS longitude if the WhatsApp bot captured the reporter's location pin */
@@ -68,10 +68,10 @@ export interface EmergencyReport {
   // Agent 1 fields — required
   dni: string
   people_affected: number
+  location_text: string
   // Agent 1 fields — optional supplementary
   full_name: string | null
   raw_transcript: string | null
-  location_text: string | null
   latitude: number | null
   longitude: number | null
   // AI-generated fields

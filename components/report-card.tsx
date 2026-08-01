@@ -39,18 +39,14 @@ export function ReportCard({ report }: Props) {
         <dt className="text-muted-foreground">People affected</dt>
         <dd>{report.people_affected}</dd>
 
+        <dt className="text-muted-foreground">Location</dt>
+        <dd>{report.location_text}</dd>
+
         {/* Optional supplementary fields */}
         {report.full_name && (
           <>
             <dt className="text-muted-foreground">Reporter</dt>
             <dd>{report.full_name}</dd>
-          </>
-        )}
-
-        {report.location_text && (
-          <>
-            <dt className="text-muted-foreground">Location</dt>
-            <dd>{report.location_text}</dd>
           </>
         )}
 

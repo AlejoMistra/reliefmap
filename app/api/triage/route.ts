@@ -52,10 +52,10 @@ export async function POST(request: NextRequest) {
       // Agent 1 — required fields
       dni:             payload.dni,
       people_affected: payload.people_affected,
+      location_text:   payload.location_text,
       // Agent 1 — optional supplementary
       full_name:       payload.full_name       ?? null,
       raw_transcript:  payload.raw_transcript  ?? null,
-      location_text:   payload.location_text   ?? null,
       latitude:        payload.latitude        ?? null,
       longitude:       payload.longitude       ?? null,
       // Agent 2 — AI-generated classification

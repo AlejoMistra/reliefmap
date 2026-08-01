@@ -75,7 +75,7 @@ export function TriageForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.description.trim() || !form.dni.trim() || !form.people_affected.trim()) return
+    if (!form.description.trim() || !form.dni.trim() || !form.people_affected.trim() || !form.location_text.trim()) return
 
     setLoading(true)
     setResult(null)
@@ -86,9 +86,9 @@ export function TriageForm() {
       dni:             form.dni.trim(),
       description:     form.description.trim(),
       people_affected: parseInt(form.people_affected, 10),
+      location_text:   form.location_text.trim(),
     }
     if (form.full_name.trim())      payload.full_name      = form.full_name.trim()
-    if (form.location_text.trim())  payload.location_text  = form.location_text.trim()
     if (form.raw_transcript.trim()) payload.raw_transcript = form.raw_transcript.trim()
     if (form.latitude.trim())       payload.latitude       = parseFloat(form.latitude)
     if (form.longitude.trim())      payload.longitude      = parseFloat(form.longitude)
@@ -122,7 +122,7 @@ export function TriageForm() {
         <div>
           <h2 className="text-base font-semibold">New Emergency Report</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Fields collected by Agent 1 (WhatsApp intake bot). DNI, description, and people affected are required — all other fields are supplementary.
+            Fields collected by Agent 1 (WhatsApp intake bot). DNI, description, location, and people affected are required — all other fields are supplementary.
           </p>
         </div>
         <button
@@ -177,6 +177,18 @@ export function TriageForm() {
               required
             />
           </Field>
+
+          <Field label="Address / landmark" required>
+            <input
+              type="text"
+              value={form.location_text}
+              onChange={set('location_text')}
+              placeholder="e.g. Calle Rivadavia 1450, Buenos Aires"
+              className={inputClass}
+              disabled={loading}
+              required
+            />
+          </Field>
         </fieldset>
 
         {/* Optional supplementary fields */}
@@ -191,17 +203,6 @@ export function TriageForm() {
               value={form.full_name}
               onChange={set('full_name')}
               placeholder="e.g. María López"
-              className={inputClass}
-              disabled={loading}
-            />
-          </Field>
-
-          <Field label="Address / landmark">
-            <input
-              type="text"
-              value={form.location_text}
-              onChange={set('location_text')}
-              placeholder="e.g. Calle Rivadavia 1450, Buenos Aires"
               className={inputClass}
               disabled={loading}
             />
@@ -246,7 +247,7 @@ export function TriageForm() {
 
         <button
           type="submit"
-          disabled={loading || !form.description.trim() || !form.dni.trim() || !form.people_affected.trim()}
+          disabled={loading || !form.description.trim() || !form.dni.trim() || !form.people_affected.trim() || !form.location_text.trim()}
           className="self-start rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50 hover:opacity-90 transition-opacity"
         >
           {loading ? 'Classifying…' : 'Classify & Store Report'}
