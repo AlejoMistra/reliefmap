@@ -13,6 +13,16 @@ import type { EmergencyReport } from '@/lib/triage/schema'
 export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
+  // ── 0. Shared-secret auth ──────────────────────────────────────────────────
+  const expectedSecret = process.env.KAPSO_API_SECRET
+  if (expectedSecret) {
+    const authHeader = request.headers.get('authorization') ?? ''
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+    if (token !== expectedSecret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  }
+
   // ── 1. Parse body ──────────────────────────────────────────────────────────
   let body: unknown
   try {
