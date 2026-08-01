@@ -120,21 +120,17 @@ export function EmergencyFeed() {
         <div className="flex items-center gap-2">
           {/* Priority filter */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className={`h-7 gap-1 text-[11px] px-2.5 ${
-                  priorityFilter
-                    ? "border-amber-500/60 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15"
-                    : ""
-                }`}
-              >
-                {priorityFilter
-                  ? PRIORITY_OPTIONS.find((p) => p.value === priorityFilter)?.label
-                  : "Prioridad"}
-                <ChevronDown className="h-3 w-3 opacity-60" />
-              </Button>
+            <DropdownMenuTrigger
+              className={`h-7 gap-1 text-[11px] px-2.5 border rounded-md inline-flex items-center justify-center font-medium hover:bg-accent hover:text-accent-foreground ${
+                priorityFilter
+                  ? "border-amber-500/60 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15"
+                  : ""
+              }`}
+            >
+              {priorityFilter
+                ? PRIORITY_OPTIONS.find((p) => p.value === priorityFilter)?.label
+                : "Prioridad"}
+              <ChevronDown className="h-3 w-3 opacity-60" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="text-xs">
               {PRIORITY_OPTIONS.map((opt) => (
@@ -155,21 +151,17 @@ export function EmergencyFeed() {
 
           {/* Status filter */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className={`h-7 gap-1 text-[11px] px-2.5 ${
-                  statusFilter
-                    ? "border-amber-500/60 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15"
-                    : ""
-                }`}
-              >
-                {statusFilter
-                  ? STATUS_LABELS[statusFilter]
-                  : "Estado"}
-                <ChevronDown className="h-3 w-3 opacity-60" />
-              </Button>
+            <DropdownMenuTrigger
+              className={`h-7 gap-1 text-[11px] px-2.5 border rounded-md inline-flex items-center justify-center font-medium hover:bg-accent hover:text-accent-foreground ${
+                statusFilter
+                  ? "border-amber-500/60 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15"
+                  : ""
+              }`}
+            >
+              {statusFilter
+                ? STATUS_LABELS[statusFilter]
+                : "Estado"}
+              <ChevronDown className="h-3 w-3 opacity-60" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="text-xs">
               {STATUS_OPTIONS.map((opt) => (
