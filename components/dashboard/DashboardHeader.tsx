@@ -1,35 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import useSWR from "swr"
 import { AlertTriangle, Radio, ShieldAlert } from "lucide-react"
+import type { EmergencyReport } from "@/lib/triage/schema"
 
-interface KPI {
-  label: string
-  value: number
-  icon: React.ReactNode
-  colorClass: string
-}
-
-const kpis: KPI[] = [
-  {
-    label: "Emergencias Activas",
-    value: 14,
-    icon: <Radio className="h-4 w-4" />,
-    colorClass: "text-em-critical",
-  },
-  {
-    label: "Reportes Sin Asignar",
-    value: 6,
-    icon: <AlertTriangle className="h-4 w-4" />,
-    colorClass: "text-em-high",
-  },
-  {
-    label: "Prioridad Critica",
-    value: 3,
-    icon: <ShieldAlert className="h-4 w-4" />,
-    colorClass: "text-em-critical",
-  },
-]
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error("failed")
+    return r.json()
+  })
 
 export function DashboardHeader() {
   const [now, setNow] = useState<Date | null>(null)
@@ -40,17 +20,28 @@ export function DashboardHeader() {
     return () => clearInterval(id)
   }, [])
 
+  const { data } = useSWR<{ reports: EmergencyReport[] }>(
+    "/api/reports?limit=200",
+    fetcher,
+    { refreshInterval: 30_000 },
+  )
+
+  const reports   = data?.reports ?? []
+  const active    = reports.filter((r) => r.is_active).length
+  const unassigned = reports.filter((r) => r.is_active).length  // all active = unassigned from header POV
+  const critical  = reports.filter((r) => r.risk_color === "RED" && r.is_active).length
+
   const dateStr = now
     ? now.toLocaleDateString("es-ES", {
         weekday: "short",
-        month: "short",
-        day: "numeric",
-        year: "numeric",
+        month:   "short",
+        day:     "numeric",
+        year:    "numeric",
       })
     : ""
   const timeStr = now
     ? now.toLocaleTimeString("es-ES", {
-        hour: "2-digit",
+        hour:   "2-digit",
         minute: "2-digit",
         second: "2-digit",
       })
@@ -75,19 +66,47 @@ export function DashboardHeader() {
 
       {/* KPIs */}
       <div className="flex items-center gap-6">
-        {kpis.map((kpi) => (
-          <div key={kpi.label} className="flex items-center gap-2">
-            <span className={kpi.colorClass}>{kpi.icon}</span>
-            <div className="text-right">
-              <p className={`text-xl font-bold leading-none ${kpi.colorClass}`}>
-                {kpi.value}
-              </p>
-              <p className="text-[10px] text-muted-foreground whitespace-nowrap">
-                {kpi.label}
-              </p>
-            </div>
+        <div className="flex items-center gap-2">
+          <span className="text-em-critical">
+            <Radio className="h-4 w-4" />
+          </span>
+          <div className="text-right">
+            <p className="text-xl font-bold leading-none text-em-critical">
+              {active}
+            </p>
+            <p className="text-[10px] text-muted-foreground whitespace-nowrap">
+              Emergencias Activas
+            </p>
           </div>
-        ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-em-high">
+            <AlertTriangle className="h-4 w-4" />
+          </span>
+          <div className="text-right">
+            <p className="text-xl font-bold leading-none text-em-high">
+              {unassigned}
+            </p>
+            <p className="text-[10px] text-muted-foreground whitespace-nowrap">
+              Reportes Sin Asignar
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-em-critical">
+            <ShieldAlert className="h-4 w-4" />
+          </span>
+          <div className="text-right">
+            <p className="text-xl font-bold leading-none text-em-critical">
+              {critical}
+            </p>
+            <p className="text-[10px] text-muted-foreground whitespace-nowrap">
+              Prioridad Critica
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Date / Time */}

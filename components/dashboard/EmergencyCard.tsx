@@ -176,20 +176,16 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
           </Button>
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 gap-1 text-[11px] px-2"
-                disabled={isUpdating}
-              >
-                {isUpdating ? (
-                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  "Estado"
-                )}
-                <ChevronDown className="h-3 w-3" />
-              </Button>
+            <DropdownMenuTrigger
+              className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-background px-2 text-[11px] font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+              disabled={isUpdating}
+            >
+              {isUpdating ? (
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                "Estado"
+              )}
+              <ChevronDown className="h-3 w-3" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="text-xs min-w-[140px]">
               {STATUSES.map((s) => (
