@@ -1,7 +1,16 @@
 import { generateText, Output } from 'ai'
-import { TriageOutputSchema, type Agent1Payload, type TriageOutput } from './schema'
+import {
+  TriageOutputSchema,
+  RISK_LEVEL_TO_COLOR,
+  escalateRiskLevel,
+  type Agent1Payload,
+  type EmergencyReport,
+  type TriageOutput,
+} from './schema'
 
 const MODEL = 'anthropic/claude-sonnet-4-5'
+
+// ── System prompt ────────────────────────────────────────────────────────────
 
 const SYSTEM_PROMPT = `You are Agent 2 — the Triage Classification Specialist in a humanitarian emergency response system.
 
@@ -22,9 +31,64 @@ CLASSIFICATION RULES
 4. The title must be at most 7 words, direct and descriptive (e.g. "Bus collision with multiple injuries").
 5. The reason must be a single sentence justifying the classification.`
 
+// ── Zone key ─────────────────────────────────────────────────────────────────
+
 /**
- * Classifies an emergency report submitted by Agent 1.
- * Accepts a fully structured payload — no free-text extraction is performed.
+ * Normalises a location string into a short zone key used for deduplication.
+ * Strips accents, lowercases, removes punctuation, keeps the first 3 tokens.
+ */
+export function buildZoneKey(location: string): string {
+  return location
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 3)
+    .join('_')
+}
+
+// ── Situation summary ─────────────────────────────────────────────────────────
+
+/**
+ * Builds a human-readable situation summary string for a unified event.
+ * This is the string that operators and downstream systems (e.g. map overlays)
+ * consume to understand the current state of an active zone.
+ *
+ * Priority rule: life risk always leads.
+ */
+export function buildSituationSummary(event: {
+  title: string
+  risk_level: number
+  risk_color: string
+  report_count: number
+  people_affected: number
+  location_text: string
+  reason: string
+  is_active: boolean
+}): string {
+  const priority = event.risk_level === 1 ? '[LIFE RISK — PRIORITY] ' : ''
+  const reportLabel = event.report_count === 1 ? '1 report' : `${event.report_count} reports`
+  const status = event.is_active ? 'ACTIVE' : 'RESOLVED'
+
+  return (
+    `${priority}${event.title} | ` +
+    `${event.risk_color} (Level ${event.risk_level}) | ` +
+    `${reportLabel} received | ` +
+    `${event.people_affected} people affected | ` +
+    `Zone: ${event.location_text} | ` +
+    `Status: ${status} | ` +
+    `Reason: ${event.reason}`
+  )
+}
+
+// ── AI classification ─────────────────────────────────────────────────────────
+
+/**
+ * Classifies an emergency report using generateText + Output.object().
+ * Only the description and people_affected are forwarded to the model —
+ * all other fields were already collected by Agent 1.
  */
 export async function classifyEmergency(payload: Agent1Payload): Promise<{
   output: TriageOutput
@@ -32,11 +96,8 @@ export async function classifyEmergency(payload: Agent1Payload): Promise<{
 }> {
   const context = [
     `Description: ${payload.description}`,
-    payload.people_affected != null ? `People affected: ${payload.people_affected}` : null,
-    payload.location_text ? `Location: ${payload.location_text}` : null,
-  ]
-    .filter(Boolean)
-    .join('\n')
+    `People affected: ${payload.people_affected}`,
+  ].join('\n')
 
   const { output } = await generateText({
     model: MODEL,
@@ -45,12 +106,24 @@ export async function classifyEmergency(payload: Agent1Payload): Promise<{
     prompt: `Classify the following emergency report:\n\n${context}`,
   })
 
-  if (!output) {
-    throw new Error('Model returned no structured output')
-  }
+  if (!output) throw new Error('Model returned no structured output')
 
-  return {
-    output,
-    modelUsed: MODEL,
-  }
+  return { output, modelUsed: MODEL }
+}
+
+// ── Escalation after merge ───────────────────────────────────────────────────
+
+/**
+ * Given an existing event that has just received a new duplicate report,
+ * returns the updated risk_level and risk_color after applying escalation rules.
+ * Life risk (RED/1) is always the ceiling — it cannot be escalated further.
+ */
+export function applyEscalation(existing: EmergencyReport): {
+  risk_level: number
+  risk_color: string
+} {
+  const newCount = existing.report_count + 1
+  const newLevel = escalateRiskLevel(existing.risk_level, newCount)
+  const newColor = RISK_LEVEL_TO_COLOR[newLevel] ?? 'RED'
+  return { risk_level: newLevel, risk_color: newColor }
 }
