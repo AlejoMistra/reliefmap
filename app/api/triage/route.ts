@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { processTranscript } from '@/lib/triage/processor'
+import { ZodError } from 'zod'
+import { Agent1Payload } from '@/lib/triage/schema'
+import { classifyEmergency } from '@/lib/triage/processor'
 import { createServiceClient } from '@/lib/supabase/server'
 
 export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
+  // --- Parse body ---
   let body: unknown
   try {
     body = await request.json()
@@ -12,48 +15,57 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { transcript } = body as { transcript?: string }
-
-  if (!transcript || typeof transcript !== 'string' || transcript.trim().length === 0) {
-    return NextResponse.json(
-      { error: 'Missing or empty "transcript" field' },
-      { status: 422 },
-    )
+  // --- Validate against Agent1Payload schema ---
+  let payload: Agent1Payload
+  try {
+    payload = Agent1Payload.parse(body)
+  } catch (err) {
+    if (err instanceof ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid payload from Agent 1', issues: err.issues },
+        { status: 422 },
+      )
+    }
+    return NextResponse.json({ error: 'Payload validation failed' }, { status: 422 })
   }
 
-  // --- AI triage processing ---
-  let triageResult: Awaited<ReturnType<typeof processTranscript>>
+  // --- AI risk classification (Agent 2) ---
+  let classification: Awaited<ReturnType<typeof classifyEmergency>>
   try {
-    triageResult = await processTranscript(transcript.trim())
+    classification = await classifyEmergency(payload)
   } catch (err) {
-    console.error('[triage] AI processing failed:', err)
+    console.error('[triage] AI classification failed:', err)
     return NextResponse.json(
-      { error: 'AI triage processing failed', detail: String(err) },
+      { error: 'AI triage classification failed', detail: String(err) },
       { status: 502 },
     )
   }
 
-  const { output, modelUsed } = triageResult
+  const { output, modelUsed } = classification
 
-  // --- Persist to Supabase ---
+  // --- Merge Agent 1 fields + AI output and persist ---
   const supabase = createServiceClient()
 
   const { data, error } = await supabase
     .from('emergency_reports')
     .insert({
-      raw_transcript: transcript.trim(),
-      full_name: output.full_name,
-      dni: output.dni,
-      title: output.title,
-      risk_level: output.risk_level,
-      risk_color: output.risk_color,
-      reason: output.reason,
-      location_text: output.location_text,
-      latitude: output.latitude,
-      longitude: output.longitude,
-      people_affected: output.people_affected,
-      model_used: modelUsed,
-      processed_at: new Date().toISOString(),
+      // Agent 1 — reporter info
+      full_name:       payload.full_name        ?? null,
+      dni:             payload.dni              ?? null,
+      // Agent 1 — situation
+      raw_transcript:  payload.raw_transcript   ?? null,
+      location_text:   payload.location_text    ?? null,
+      latitude:        payload.latitude         ?? null,
+      longitude:       payload.longitude        ?? null,
+      people_affected: payload.people_affected  ?? null,
+      // Agent 2 — AI-generated classification
+      title:           output.title,
+      risk_level:      output.risk_level,
+      risk_color:      output.risk_color,
+      reason:          output.reason,
+      // Metadata
+      model_used:      modelUsed,
+      processed_at:    new Date().toISOString(),
     })
     .select()
     .single()

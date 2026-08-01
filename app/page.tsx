@@ -7,7 +7,7 @@ export default function Home() {
       <header className="border-b border-border px-6 py-4">
         <h1 className="text-xl font-semibold tracking-tight">ReliefMap — Triage Processor</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Submit a raw WhatsApp transcript to generate and store a structured emergency report.
+          Agent 2 — receives structured data from the WhatsApp intake bot (Agent 1), classifies risk, and stores the report.
         </p>
       </header>
 
