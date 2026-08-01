@@ -1,11 +1,14 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import useSWR, { mutate } from 'swr'
 import type { EmergencyReport, RiskColor } from '@/lib/triage/schema'
 import { ReportCard } from './report-card'
+import { useState } from 'react'
+
+export const REPORTS_KEY = '/api/reports'
 
 const COLORS: Array<{ label: string; value: RiskColor | '' }> = [
-  { label: 'All', value: '' },
+  { label: 'All',    value: '' },
   { label: 'RED',    value: 'RED' },
   { label: 'ORANGE', value: 'ORANGE' },
   { label: 'YELLOW', value: 'YELLOW' },
@@ -13,79 +16,95 @@ const COLORS: Array<{ label: string; value: RiskColor | '' }> = [
   { label: 'BLUE',   value: 'BLUE' },
 ]
 
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error('Failed to fetch reports')
+    return r.json()
+  })
+
+export function revalidateReports() {
+  mutate(REPORTS_KEY)
+}
+
 export function ReportsList() {
-  const [reports, setReports] = useState<EmergencyReport[]>([])
   const [filter, setFilter] = useState<RiskColor | ''>('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const fetchReports = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const params = new URLSearchParams({ limit: '20' })
-      if (filter) params.set('risk_color', filter)
-      const res = await fetch(`/api/reports?${params}`)
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error ?? 'Fetch failed')
-      setReports(json.reports ?? [])
-    } catch (err) {
-      setError(String(err))
-    } finally {
-      setLoading(false)
-    }
-  }, [filter])
+  const swrKey = filter ? `${REPORTS_KEY}?risk_color=${filter}&limit=20` : `${REPORTS_KEY}?limit=20`
 
-  useEffect(() => {
-    fetchReports()
-  }, [fetchReports])
+  const { data, error, isLoading, isValidating } = useSWR<{ reports: EmergencyReport[] }>(
+    swrKey,
+    fetcher,
+    { refreshInterval: 30_000 },
+  )
+
+  const reports = data?.reports ?? []
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+    <section className="flex flex-col gap-4 h-full">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h2 className="text-base font-semibold">Stored Reports</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">Most recent 20 reports from Supabase.</p>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Incoming Reports
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Live feed from Kapso · auto-refreshes every 30s
+          </p>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 flex-wrap">
           {COLORS.map((c) => (
             <button
               key={c.value}
               onClick={() => setFilter(c.value)}
-              className={`rounded-md px-3 py-1 text-xs font-medium border transition-colors ${
+              className={`rounded px-2.5 py-1 text-xs font-medium border transition-colors ${
                 filter === c.value
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'border-border text-muted-foreground hover:text-foreground'
               }`}
             >
-              {c.label}
+              {c.label || 'All'}
             </button>
           ))}
-
-          <button
-            onClick={fetchReports}
-            disabled={loading}
-            className="ml-2 rounded-md border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Loading…' : 'Refresh'}
-          </button>
         </div>
       </div>
 
+      {/* Validating indicator */}
+      {isValidating && !isLoading && (
+        <p className="text-xs text-muted-foreground animate-pulse">Refreshing…</p>
+      )}
+
+      {/* Error */}
       {error && (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
+          {String(error)}
         </div>
       )}
 
-      {!loading && reports.length === 0 && !error && (
-        <p className="text-sm text-muted-foreground py-6 text-center">
-          No reports found. Submit a transcript above to generate the first one.
-        </p>
+      {/* Empty */}
+      {!isLoading && !error && reports.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-2">
+          <p className="text-sm text-muted-foreground">No reports yet.</p>
+          <p className="text-xs text-muted-foreground">
+            Submit a report via the form or wait for Kapso to send one.
+          </p>
+        </div>
       )}
 
-      <div className="flex flex-col gap-4">
+      {/* Loading skeleton */}
+      {isLoading && (
+        <div className="flex flex-col gap-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-lg border border-border bg-card h-32 animate-pulse"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Report cards */}
+      <div className="flex flex-col gap-3">
         {reports.map((report) => (
           <ReportCard key={report.id} report={report} />
         ))}

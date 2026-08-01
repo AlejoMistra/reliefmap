@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { EmergencyReport } from '@/lib/triage/schema'
 import { ReportCard } from './report-card'
+import { revalidateReports } from './reports-list'
 
 interface FormState {
   full_name: string
@@ -109,6 +110,7 @@ export function TriageForm() {
 
       setResult(json.report as EmergencyReport)
       setForm(EMPTY_FORM)
+      revalidateReports()
     } catch (err) {
       setError('Network error — could not reach the API.')
     } finally {
@@ -118,13 +120,8 @@ export function TriageForm() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-base font-semibold">New Emergency Report</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Fields collected by Agent 1 (WhatsApp intake bot). DNI, description, location, and people affected are required — all other fields are supplementary.
-          </p>
-        </div>
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-xs text-muted-foreground">Fields marked <span className="text-destructive">*</span> are required.</p>
         <button
           type="button"
           onClick={() => setForm(SAMPLE)}
