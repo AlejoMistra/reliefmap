@@ -11,11 +11,18 @@ export async function GET(request: NextRequest) {
 
   const supabase = createServiceClient()
 
+  // By default only return active reports; pass `include_resolved=true` to override
+  const includeResolved = searchParams.get('include_resolved') === 'true'
+
   let query = supabase
     .from('emergency_reports')
     .select('*')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
+
+  if (!includeResolved) {
+    query = query.eq('is_active', true)
+  }
 
   if (riskColor) {
     query = query.eq('risk_color', riskColor)

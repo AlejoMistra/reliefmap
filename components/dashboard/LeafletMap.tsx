@@ -44,15 +44,26 @@ function makeIcon(color: RiskColor) {
   })
 }
 
-// ── Auto-fit bounds when pins change ─────────────────────────────────────────
+// ── Auto-fit bounds to Rosario pins only ─────────────────────────────────────
+// Fit only pins inside Rosario's bounding box to avoid zooming out to other cities.
+const ROSARIO_BOUNDS = { minLat: -33.05, maxLat: -32.85, minLng: -60.80, maxLng: -60.55 }
+
+function isInRosario(p: PinReport) {
+  return (
+    p.latitude  >= ROSARIO_BOUNDS.minLat && p.latitude  <= ROSARIO_BOUNDS.maxLat &&
+    p.longitude >= ROSARIO_BOUNDS.minLng && p.longitude <= ROSARIO_BOUNDS.maxLng
+  )
+}
+
 function AutoFit({ pins }: { pins: PinReport[] }) {
   const map = useMap()
   const fittedRef = useRef(false)
 
   useEffect(() => {
-    if (pins.length === 0 || fittedRef.current) return
-    const bounds = L.latLngBounds(pins.map((p) => [p.latitude, p.longitude]))
-    map.fitBounds(bounds, { padding: [48, 48], maxZoom: 13, animate: true })
+    const rosarioPins = pins.filter(isInRosario)
+    if (rosarioPins.length === 0 || fittedRef.current) return
+    const bounds = L.latLngBounds(rosarioPins.map((p) => [p.latitude, p.longitude]))
+    map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14, animate: true })
     fittedRef.current = true
   }, [pins, map])
 
@@ -117,8 +128,8 @@ export default function LeafletMap() {
       )}
 
       <MapContainer
-        center={[-34.6, -58.4]}
-        zoom={5}
+        center={[-32.9468, -60.6393]}
+        zoom={13}
         className="h-full w-full"
         zoomControl={false}
         attributionControl={false}
