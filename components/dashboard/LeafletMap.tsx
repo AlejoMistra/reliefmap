@@ -117,8 +117,8 @@ export default function LeafletMap() {
       )}
 
       <MapContainer
-        center={[-34.6, -58.4]}
-        zoom={5}
+        center={[-32.9468, -60.6393]}
+        zoom={13}
         className="h-full w-full"
         zoomControl={false}
         attributionControl={false}
