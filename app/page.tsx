@@ -1,16 +1,21 @@
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
+import { MapPanel } from "@/components/dashboard/MapPanel"
+import { EmergencyFeed } from "@/components/dashboard/EmergencyFeed"
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans">
-      <main className="flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-16 text-center sm:items-start sm:text-left">
-        <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-bold tracking-tight">
-            ReliefMap
-          </h1>
-          <p className="max-w-md text-lg text-muted-foreground">
-            To get started, send a prompt or modify this page directly.
-          </p>
-        </div>
+    <div className="flex h-screen flex-col overflow-hidden bg-background font-sans">
+      <DashboardHeader />
+      <main className="flex flex-1 overflow-hidden">
+        {/* Map — 60% */}
+        <section className="flex-[3] border-r border-border overflow-hidden">
+          <MapPanel />
+        </section>
+        {/* Feed — 40% */}
+        <section className="flex-[2] overflow-hidden">
+          <EmergencyFeed />
+        </section>
       </main>
     </div>
-  );
+  )
 }
