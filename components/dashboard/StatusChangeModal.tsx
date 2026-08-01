@@ -47,6 +47,12 @@ export function StatusChangeModal({
     cancelRef.current?.focus()
   }, [])
 
+  // Signal to the rest of the page that a modal is open (used to hide Leaflet map)
+  useEffect(() => {
+    document.body.dataset.modalOpen = "true"
+    return () => { delete document.body.dataset.modalOpen }
+  }, [])
+
   // Close on Escape
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {

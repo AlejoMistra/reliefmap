@@ -120,7 +120,7 @@ export function EmergencyFeed() {
           <div className="flex items-center gap-2">
             <ListFilter className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-semibold text-foreground">
-              Reportes Activos (Kapso + MCP)
+              Reportes Activos
             </span>
             <span className="rounded-full bg-red-500/15 text-red-400 border border-red-500/30 px-2 py-0.5 text-[10px] font-bold">
               {filtered.length}

@@ -40,8 +40,8 @@ export function MapPanel() {
         </span>
       </div>
 
-      {/* Map fills remaining space */}
-      <div className="relative flex-1 overflow-hidden">
+      {/* Map fills remaining space — hidden while any modal is open to prevent Leaflet tiles bleeding through */}
+      <div className="relative flex-1 overflow-hidden map-panel-content">
         <Suspense fallback={null}>
           <LeafletMap />
         </Suspense>

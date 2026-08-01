@@ -158,7 +158,7 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
             onClick={() => setShowReportModal(!showReportModal)}
           >
             <FileText className="h-3 w-3 text-sky-400" />
-            Reporte Agente 2
+            Reporte
           </Button>
 
           <DropdownMenu>

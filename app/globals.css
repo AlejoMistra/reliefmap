@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import 'leaflet/dist/leaflet.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -183,4 +182,11 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Hide the Leaflet map completely while any modal is open.
+   Leaflet renders tiles/markers in its own DOM layer which bleeds
+   through React portals regardless of z-index stacking. */
+body[data-modal-open] .map-panel-content {
+  visibility: hidden;
 }
