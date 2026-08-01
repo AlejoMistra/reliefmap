@@ -12,19 +12,19 @@ interface KPI {
 
 const kpis: KPI[] = [
   {
-    label: "Active Emergencies",
+    label: "Emergencias Activas",
     value: 14,
     icon: <Radio className="h-4 w-4" />,
     colorClass: "text-em-critical",
   },
   {
-    label: "Unassigned Reports",
+    label: "Reportes Sin Asignar",
     value: 6,
     icon: <AlertTriangle className="h-4 w-4" />,
     colorClass: "text-em-high",
   },
   {
-    label: "Critical Priority",
+    label: "Prioridad Critica",
     value: 3,
     icon: <ShieldAlert className="h-4 w-4" />,
     colorClass: "text-em-critical",
@@ -41,7 +41,7 @@ export function DashboardHeader() {
   }, [])
 
   const dateStr = now
-    ? now.toLocaleDateString("en-US", {
+    ? now.toLocaleDateString("es-ES", {
         weekday: "short",
         month: "short",
         day: "numeric",
@@ -49,12 +49,12 @@ export function DashboardHeader() {
       })
     : ""
   const timeStr = now
-    ? now.toLocaleTimeString("en-US", {
+    ? now.toLocaleTimeString("es-ES", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
       })
-    : "--:--:-- --"
+    : "--:--:--"
 
   return (
     <header className="flex items-center justify-between border-b border-border bg-card px-5 py-3">
@@ -68,7 +68,7 @@ export function DashboardHeader() {
             ReliefMap
           </h1>
           <p className="text-[10px] text-muted-foreground tracking-wider uppercase">
-            Emergency Operations Center
+            Centro de Operaciones de Emergencia
           </p>
         </div>
       </div>

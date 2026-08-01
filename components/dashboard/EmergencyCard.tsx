@@ -17,22 +17,22 @@ const PRIORITY_CONFIG: Record<
   { label: string; badgeClass: string; borderStyle: string }
 > = {
   critical: {
-    label: "Critical",
+    label: "Critico",
     badgeClass: "bg-em-critical/15 text-em-critical border border-em-critical/30",
     borderStyle: "border-l-[3px] border-l-em-critical",
   },
   high: {
-    label: "High",
+    label: "Alto",
     badgeClass: "bg-em-high/15 text-em-high border border-em-high/30",
     borderStyle: "border-l-[3px] border-l-em-high",
   },
   medium: {
-    label: "Medium",
+    label: "Medio",
     badgeClass: "bg-em-medium/15 text-em-medium border border-em-medium/30",
     borderStyle: "border-l-[3px] border-l-em-medium",
   },
   low: {
-    label: "Low",
+    label: "Bajo",
     badgeClass: "bg-em-low/15 text-em-low border border-em-low/30",
     borderStyle: "border-l-[3px] border-l-em-low",
   },
@@ -48,9 +48,9 @@ const STATUS_CLASSES: Record<Status, string> = {
 function getElapsed(date: Date): string {
   const diffMs = Date.now() - date.getTime()
   const mins = Math.floor(diffMs / 60000)
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 60) return `hace ${mins}m`
   const hrs = Math.floor(mins / 60)
-  return `${hrs}h ${mins % 60}m ago`
+  return `hace ${hrs}h ${mins % 60}m`
 }
 
 interface EmergencyCardProps {
@@ -103,7 +103,7 @@ export function EmergencyCard({ emergency }: EmergencyCardProps) {
       <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1">
           <Users className="h-3 w-3" />
-          {emergency.affectedPeople === 0 ? "No casualties" : `${emergency.affectedPeople} affected`}
+          {emergency.affectedPeople === 0 ? "Sin afectados" : `${emergency.affectedPeople} afectados`}
         </span>
         <span className="flex items-center gap-1">
           <Clock className="h-3 w-3" />
@@ -122,7 +122,7 @@ export function EmergencyCard({ emergency }: EmergencyCardProps) {
           className="h-7 gap-1.5 text-[11px] bg-em-accent text-white hover:bg-em-accent/85 flex-1"
         >
           <Send className="h-3 w-3" />
-          Dispatch
+          Despachar
         </Button>
         <Button
           size="sm"
@@ -130,12 +130,12 @@ export function EmergencyCard({ emergency }: EmergencyCardProps) {
           className="h-7 gap-1.5 text-[11px]"
         >
           <Eye className="h-3 w-3" />
-          Details
+          Detalles
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button size="sm" variant="outline" className="h-7 gap-1 text-[11px] px-2">
-              Status
+              Estado
               <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>

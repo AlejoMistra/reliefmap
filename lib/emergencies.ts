@@ -15,10 +15,10 @@ export interface Emergency {
 export const EMERGENCIES: Emergency[] = [
   {
     id: "RPT-0041",
-    title: "Multiple Vehicle Collision",
-    location: "Hwy 12 & Oak St, Zone A3",
+    title: "Colision Multiple de Vehiculos",
+    location: "Autopista 12 y Calle Roble, Zona A3",
     description:
-      "AI analysis indicates a 4-car pileup blocking two lanes. Possible fuel leak reported. At least 3 individuals appear injured based on imagery.",
+      "Analisis de IA indica un choque multiple de 4 vehiculos bloqueando dos carriles. Se reporta posible fuga de combustible. Al menos 3 personas con lesiones aparentes segun imagenes.",
     priority: "critical",
     affectedPeople: 11,
     reportedAt: new Date(Date.now() - 1000 * 60 * 4),
@@ -26,10 +26,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0039",
-    title: "Structural Fire — Residential",
-    location: "48 Maple Ave, Zone B1",
+    title: "Incendio Estructural — Residencial",
+    location: "Av. Los Pinos 48, Zona B1",
     description:
-      "AI model detects active fire on second floor of a two-story residential building. Smoke density suggests rapid spread. Evacuation of adjacent units recommended.",
+      "Modelo de IA detecta incendio activo en el segundo piso de una vivienda de dos plantas. La densidad de humo indica propagacion rapida. Se recomienda evacuar las unidades adyacentes.",
     priority: "critical",
     affectedPeople: 6,
     reportedAt: new Date(Date.now() - 1000 * 60 * 7),
@@ -37,10 +37,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0038",
-    title: "Flash Flood Warning",
-    location: "Riverside District, Zone C2",
+    title: "Alerta de Inundacion Repentina",
+    location: "Distrito Ribera, Zona C2",
     description:
-      "Water levels at the Kern Creek sensor have exceeded the 2.4m threshold. AI model projects downstream flooding of low-lying residential areas within 45 minutes.",
+      "El sensor del Rio Kern supero el umbral de 2.4m. El modelo de IA proyecta inundacion de zonas residenciales bajas en 45 minutos.",
     priority: "critical",
     affectedPeople: 340,
     reportedAt: new Date(Date.now() - 1000 * 60 * 12),
@@ -48,10 +48,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0037",
-    title: "Gas Leak — Commercial Block",
-    location: "Commerce Blvd 200-220, Zone D4",
+    title: "Fuga de Gas — Bloque Comercial",
+    location: "Blvd. Comercio 200-220, Zona D4",
     description:
-      "Sensor network detected methane concentration at 2.1× safe threshold. AI classification: high-risk, potential ignition hazard. Area within 100m advised to evacuate.",
+      "Red de sensores detecto concentracion de metano a 2.1 veces el umbral seguro. Clasificacion IA: alto riesgo, peligro potencial de ignicion. Se aconseja evacuar 100m a la redonda.",
     priority: "high",
     affectedPeople: 55,
     reportedAt: new Date(Date.now() - 1000 * 60 * 18),
@@ -59,10 +59,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0036",
-    title: "Medical Emergency — Cardiac",
-    location: "Central Park Pavilion, Zone B3",
+    title: "Emergencia Medica — Paro Cardiaco",
+    location: "Pabellon Parque Central, Zona B3",
     description:
-      "Report of an unresponsive adult male, approximately 60 years old. Bystander CPR in progress. AED on scene. AI severity score: 9.1/10.",
+      "Reporte de adulto masculino inconsciente, aproximadamente 60 anos. RCP por transeuntes en curso. DEA disponible en escena. Puntuacion de gravedad IA: 9.1/10.",
     priority: "high",
     affectedPeople: 1,
     reportedAt: new Date(Date.now() - 1000 * 60 * 22),
@@ -70,10 +70,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0035",
-    title: "Power Line Down",
-    location: "Elm Street & 4th Ave, Zone A1",
+    title: "Cable Electrico Caido",
+    location: "Calle Olmo y 4a Av., Zona A1",
     description:
-      "Downed power line reported following storm. AI model confirms active current risk. Traffic disruption affecting two intersections. No casualties reported.",
+      "Cable electrico derribado por tormenta. Modelo de IA confirma riesgo de corriente activa. Interrupcion del trafico en dos intersecciones. Sin victimas reportadas.",
     priority: "high",
     affectedPeople: 0,
     reportedAt: new Date(Date.now() - 1000 * 60 * 35),
@@ -81,10 +81,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0034",
-    title: "Hazmat Spill — Minor",
-    location: "Industrial Lot C, Zone E2",
+    title: "Derrame de Materiales Peligrosos — Menor",
+    location: "Lote Industrial C, Zona E2",
     description:
-      "Small chemical container breach detected by environmental sensors. AI classification: low volatility, non-airborne. Containment team response adequate.",
+      "Sensores ambientales detectaron ruptura menor de contenedor quimico. Clasificacion IA: baja volatilidad, no aereo. Respuesta del equipo de contencion adecuada.",
     priority: "medium",
     affectedPeople: 4,
     reportedAt: new Date(Date.now() - 1000 * 60 * 48),
@@ -92,10 +92,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0033",
-    title: "Traffic Signal Outage",
-    location: "Main & 5th Intersection, Zone A2",
+    title: "Fallo de Semaforos",
+    location: "Interseccion Principal y 5a, Zona A2",
     description:
-      "Complete signal failure at a high-traffic intersection. Manual control or officer deployment recommended to prevent secondary incidents.",
+      "Fallo total de semaforos en interseccion de alto trafico. Se recomienda control manual o despliegue de agentes para prevenir incidentes secundarios.",
     priority: "medium",
     affectedPeople: 0,
     reportedAt: new Date(Date.now() - 1000 * 60 * 55),
@@ -103,10 +103,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0032",
-    title: "Missing Person — Child",
-    location: "Westfield Mall, Zone B2",
+    title: "Persona Desaparecida — Menor",
+    location: "Centro Comercial Westfield, Zona B2",
     description:
-      "Child, approximately 7 years old, reported missing by guardian. Last seen near the food court. CCTV review initiated.",
+      "Menor de aproximadamente 7 anos reportado desaparecido por su tutor. Visto por ultima vez cerca del area de comidas. Revision de CCTV iniciada.",
     priority: "medium",
     affectedPeople: 1,
     reportedAt: new Date(Date.now() - 1000 * 60 * 62),
@@ -114,10 +114,10 @@ export const EMERGENCIES: Emergency[] = [
   },
   {
     id: "RPT-0031",
-    title: "Minor Vehicle Incident",
-    location: "Parking Lot 9, Zone D1",
+    title: "Incidente Vehicular Menor",
+    location: "Estacionamiento 9, Zona D1",
     description:
-      "Fender-bender reported with no injuries. Both drivers present. Police report requested for insurance purposes.",
+      "Colision leve sin lesionados. Ambos conductores presentes en el lugar. Reporte policial solicitado para tramite de seguro.",
     priority: "low",
     affectedPeople: 2,
     reportedAt: new Date(Date.now() - 1000 * 60 * 90),
@@ -133,8 +133,8 @@ export const PRIORITY_ORDER: Record<Priority, number> = {
 }
 
 export const STATUS_LABELS: Record<Status, string> = {
-  unassigned: "Unassigned",
-  dispatched: "Dispatched",
-  "in-progress": "In Progress",
-  resolved: "Resolved",
+  unassigned: "Sin Asignar",
+  dispatched: "Despachado",
+  "in-progress": "En Curso",
+  resolved: "Resuelto",
 }

@@ -14,14 +14,14 @@ export function EmergencyFeed() {
         <div className="flex items-center gap-2">
           <ListFilter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">
-            Active Reports
+            Reportes Activos
           </span>
           <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
             {sorted.length}
           </span>
         </div>
         <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-          Sorted by priority
+          Por prioridad
         </span>
       </div>
 

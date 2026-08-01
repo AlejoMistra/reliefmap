@@ -1,10 +1,10 @@
 import { Map, MapPin } from "lucide-react"
 
 const LEGEND = [
-  { label: "Critical", colorClass: "bg-em-critical" },
-  { label: "High", colorClass: "bg-em-high" },
-  { label: "Medium", colorClass: "bg-em-medium" },
-  { label: "Low", colorClass: "bg-em-low" },
+  { label: "Critico", colorClass: "bg-em-critical" },
+  { label: "Alto", colorClass: "bg-em-high" },
+  { label: "Medio", colorClass: "bg-em-medium" },
+  { label: "Bajo", colorClass: "bg-em-low" },
 ]
 
 // Mock pin positions (% from top-left)
@@ -34,11 +34,11 @@ export function MapPanel() {
         <div className="flex items-center gap-2">
           <Map className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">
-            Live Emergency Map
+            Mapa de Emergencias en Vivo
           </span>
         </div>
         <span className="rounded-full bg-em-critical/15 px-2 py-0.5 text-[10px] font-semibold text-em-critical uppercase tracking-wider">
-          Live
+          En Vivo
         </span>
       </div>
 
@@ -79,7 +79,7 @@ export function MapPanel() {
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
           <Map className="h-10 w-10 text-muted-foreground opacity-20" />
           <p className="text-xs text-muted-foreground opacity-40 tracking-widest uppercase">
-            Live Emergency Map Integration
+            Integracion de Mapa en Vivo
           </p>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function MapPanel() {
       {/* Legend */}
       <div className="flex items-center gap-4 border-t border-border px-4 py-2">
         <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-          Priority
+          Prioridad
         </span>
         {LEGEND.map((l) => (
           <div key={l.label} className="flex items-center gap-1.5">
