@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { StatusChangeModal } from "./StatusChangeModal"
+import { DispatchModal } from "./DispatchModal"
 import type { Emergency, Status, TriageLevel } from "@/lib/emergencies"
 import { STATUS_LABELS, TRIAGE_LEVELS } from "@/lib/emergencies"
 
@@ -41,6 +42,7 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
   const [status, setStatus] = useState<Status>(emergency.status)
   const [elapsed, setElapsed] = useState<string | null>(null)
   const [showReportModal, setShowReportModal] = useState(false)
+  const [showDispatchModal, setShowDispatchModal] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<Status | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -77,6 +79,11 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
 
   function handleCancel() {
     setPendingStatus(null)
+  }
+
+  async function handleDispatchConfirm(_emergencyId: string, _unit: string, _notes: string) {
+    setShowDispatchModal(false)
+    await handleConfirm(emergency.id, "dispatched")
   }
 
   return (
@@ -138,6 +145,8 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
           <Button
             size="sm"
             className="h-7 gap-1.5 text-[11px] bg-red-600 hover:bg-red-700 text-white font-medium flex-1"
+            onClick={() => setShowDispatchModal(true)}
+            disabled={status === "resolved"}
           >
             <Send className="h-3 w-3" />
             Despachar
@@ -223,7 +232,16 @@ export function EmergencyCard({ emergency, onStatusChange }: EmergencyCardProps)
         )}
       </article>
 
-      {/* Confirmation modal */}
+      {/* Dispatch modal */}
+      {showDispatchModal && (
+        <DispatchModal
+          emergency={emergency}
+          onConfirm={handleDispatchConfirm}
+          onCancel={() => setShowDispatchModal(false)}
+        />
+      )}
+
+      {/* Status change confirmation modal */}
       {pendingStatus !== null && (
         <StatusChangeModal
           emergencyId={emergency.id}
