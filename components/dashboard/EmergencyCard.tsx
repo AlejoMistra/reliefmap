@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Clock, Users, Hash, ChevronDown, Send, Eye } from "lucide-react"
+import { Clock, Users, Hash, ChevronDown, Send, Eye, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,45 +9,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { Emergency, Priority, Status } from "@/lib/emergencies"
-import { STATUS_LABELS } from "@/lib/emergencies"
-
-const PRIORITY_CONFIG: Record<
-  Priority,
-  { label: string; badgeClass: string; borderStyle: string }
-> = {
-  critical: {
-    label: "Critico",
-    badgeClass: "bg-em-critical/15 text-em-critical border border-em-critical/30",
-    borderStyle: "border-l-[3px] border-l-em-critical",
-  },
-  high: {
-    label: "Alto",
-    badgeClass: "bg-em-high/15 text-em-high border border-em-high/30",
-    borderStyle: "border-l-[3px] border-l-em-high",
-  },
-  medium: {
-    label: "Medio",
-    badgeClass: "bg-em-medium/15 text-em-medium border border-em-medium/30",
-    borderStyle: "border-l-[3px] border-l-em-medium",
-  },
-  low: {
-    label: "Bajo",
-    badgeClass: "bg-em-low/15 text-em-low border border-em-low/30",
-    borderStyle: "border-l-[3px] border-l-em-low",
-  },
-}
+import type { Emergency, Status, TriageLevel } from "@/lib/emergencies"
+import { STATUS_LABELS, TRIAGE_LEVELS } from "@/lib/emergencies"
 
 const STATUS_CLASSES: Record<Status, string> = {
   unassigned: "text-muted-foreground",
   dispatched: "text-blue-400",
-  "in-progress": "text-em-medium",
-  resolved: "text-em-low",
+  "in-progress": "text-amber-400",
+  resolved: "text-emerald-400",
 }
 
-function getElapsed(date: Date): string {
+function getElapsed(dateInput: Date | string): string {
+  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput
   const diffMs = Date.now() - date.getTime()
   const mins = Math.floor(diffMs / 60000)
+  if (mins < 1) return "hace unos segundos"
   if (mins < 60) return `hace ${mins}m`
   const hrs = Math.floor(mins / 60)
   return `hace ${hrs}h ${mins % 60}m`
@@ -62,37 +38,48 @@ const STATUSES: Status[] = ["unassigned", "dispatched", "in-progress", "resolved
 export function EmergencyCard({ emergency }: EmergencyCardProps) {
   const [status, setStatus] = useState<Status>(emergency.status)
   const [elapsed, setElapsed] = useState<string | null>(null)
-  const cfg = PRIORITY_CONFIG[emergency.priority]
+  const [showReportModal, setShowReportModal] = useState(false)
+
+  const level: TriageLevel = emergency.triageLevel || 3
+  const triageMeta = TRIAGE_LEVELS[level] || TRIAGE_LEVELS[3]
 
   useEffect(() => {
     setElapsed(getElapsed(emergency.reportedAt))
-    const id = setInterval(() => setElapsed(getElapsed(emergency.reportedAt)), 30000)
+    const id = setInterval(() => setElapsed(getElapsed(emergency.reportedAt)), 10000)
     return () => clearInterval(id)
   }, [emergency.reportedAt])
 
   return (
     <article
-      className={`rounded-md border border-border ${cfg.borderStyle} bg-card p-3 flex flex-col gap-2.5`}
+      className="rounded-md border border-border bg-card p-3 flex flex-col gap-2.5 shadow-sm transition-all hover:border-muted-foreground/30"
+      style={{ borderLeftWidth: "4px", borderLeftColor: triageMeta.dotColor }}
     >
       {/* Top row */}
       <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${cfg.badgeClass}`}
+              className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${triageMeta.badgeColor}`}
             >
-              {cfg.label}
+              {triageMeta.label}
             </span>
             <span className={`text-[10px] font-medium uppercase tracking-wider ${STATUS_CLASSES[status]}`}>
               {STATUS_LABELS[status]}
             </span>
           </div>
-          <h3 className="text-sm font-semibold text-foreground leading-snug mt-0.5">
+          <h3 className="text-sm font-semibold text-foreground leading-snug mt-1">
             {emergency.title}
           </h3>
           <p className="text-[11px] text-muted-foreground">{emergency.location}</p>
         </div>
       </div>
+
+      {/* Informant / DNI if available */}
+      {emergency.informantName && (
+        <div className="text-[11px] font-medium text-foreground/80 bg-muted/50 px-2 py-1 rounded border border-border/50">
+          Informante: <span className="text-foreground">{emergency.informantName}</span>
+        </div>
+      )}
 
       {/* Description */}
       <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
@@ -100,26 +87,26 @@ export function EmergencyCard({ emergency }: EmergencyCardProps) {
       </p>
 
       {/* Data points */}
-      <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
+      <div className="flex items-center gap-4 text-[11px] text-muted-foreground flex-wrap">
         <span className="flex items-center gap-1">
-          <Users className="h-3 w-3" />
+          <Users className="h-3 w-3 text-foreground/70" />
           {emergency.affectedPeople === 0 ? "Sin afectados" : `${emergency.affectedPeople} afectados`}
         </span>
         <span className="flex items-center gap-1">
-          <Clock className="h-3 w-3" />
+          <Clock className="h-3 w-3 text-foreground/70" />
           {elapsed ?? "—"}
         </span>
-        <span className="flex items-center gap-1">
-          <Hash className="h-3 w-3" />
+        <span className="flex items-center gap-1 font-mono text-[10px]">
+          <Hash className="h-3 w-3 text-foreground/70" />
           {emergency.id}
         </span>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 pt-0.5">
+      <div className="flex items-center gap-2 pt-1 border-t border-border/50">
         <Button
           size="sm"
-          className="h-7 gap-1.5 text-[11px] bg-em-accent text-white hover:bg-em-accent/85 flex-1"
+          className="h-7 gap-1.5 text-[11px] bg-red-600 hover:bg-red-700 text-white font-medium flex-1"
         >
           <Send className="h-3 w-3" />
           Despachar
@@ -128,16 +115,15 @@ export function EmergencyCard({ emergency }: EmergencyCardProps) {
           size="sm"
           variant="outline"
           className="h-7 gap-1.5 text-[11px]"
+          onClick={() => setShowReportModal(!showReportModal)}
         >
-          <Eye className="h-3 w-3" />
-          Detalles
+          <FileText className="h-3 w-3 text-sky-400" />
+          Reporte Agente 2
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="outline" className="h-7 gap-1 text-[11px] px-2">
-              Estado
-              <ChevronDown className="h-3 w-3" />
-            </Button>
+          <DropdownMenuTrigger className="h-7 gap-1 text-[11px] px-2 border rounded-md inline-flex items-center justify-center font-medium hover:bg-accent hover:text-accent-foreground">
+            Estado
+            <ChevronDown className="h-3 w-3" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="text-xs">
             {STATUSES.map((s) => (
@@ -152,6 +138,32 @@ export function EmergencyCard({ emergency }: EmergencyCardProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Formatted Report Modal / Collapse */}
+      {showReportModal && (
+        <div className="mt-2 p-3 bg-zinc-950 rounded-md border border-red-500/30 text-zinc-100 font-mono text-[11px] space-y-1">
+          <div className="flex items-center justify-between text-xs font-bold text-red-400 mb-1 border-b border-zinc-800 pb-1">
+            <span>🚨 REPORTE GENERADO POR AGENTE 2</span>
+            <button
+              onClick={() => setShowReportModal(false)}
+              className="text-zinc-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+          <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-zinc-200">
+            {emergency.formattedReport ||
+              `🚨 REPORTE DE EMERGENCIA
+
+- Nombre y Apellido: ${emergency.informantName || "Informante Kapso"}
+- Título de la Descripción: ${emergency.title}
+- Categorización de Riesgo: ${triageMeta.label}
+- Motivo: ${emergency.reason || "Evaluación de triaje automática"}
+- Ubicación del Problema: ${emergency.location}
+- Número de Afectados: ${emergency.affectedPeople}`}
+          </pre>
+        </div>
+      )}
     </article>
   )
 }
