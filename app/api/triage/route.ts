@@ -35,8 +35,16 @@ export async function POST(request: NextRequest) {
     classification = await classifyEmergency(payload)
   } catch (err) {
     console.error('[triage] AI classification failed:', err)
+    const message = String(err)
+    const isBillingError =
+      message.includes('credit card') || message.includes('customer_verification_required')
     return NextResponse.json(
-      { error: 'AI triage classification failed', detail: String(err) },
+      {
+        error: isBillingError
+          ? 'AI Gateway requires a credit card on file. Visit https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dadd-credit-card to add one and unlock free credits.'
+          : 'AI triage classification failed',
+        detail: String(err),
+      },
       { status: 502 },
     )
   }
