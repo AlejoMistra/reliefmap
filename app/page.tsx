@@ -1,16 +1,20 @@
+import { TriageForm } from '@/components/triage-form'
+import { ReportsList } from '@/components/reports-list'
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans">
-      <main className="flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-16 text-center sm:items-start sm:text-left">
-        <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-bold tracking-tight">
-            ReliefMap
-          </h1>
-          <p className="max-w-md text-lg text-muted-foreground">
-            To get started, send a prompt or modify this page directly.
-          </p>
-        </div>
+    <div className="min-h-screen bg-background font-sans">
+      <header className="border-b border-border px-6 py-4">
+        <h1 className="text-xl font-semibold tracking-tight">ReliefMap — Triage Processor</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Submit a raw WhatsApp transcript to generate and store a structured emergency report.
+        </p>
+      </header>
+
+      <main className="mx-auto max-w-4xl px-6 py-8 flex flex-col gap-10">
+        <TriageForm />
+        <ReportsList />
       </main>
     </div>
-  );
+  )
 }
