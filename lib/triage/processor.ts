@@ -83,6 +83,47 @@ export function buildSituationSummary(event: {
   )
 }
 
+// ── Dev bypass ────────────────────────────────────────────────────────────────
+
+/**
+ * When NEXT_PUBLIC_DEV_BYPASS_AI=true, skip the AI Gateway and return a
+ * deterministic mock classification so the full pipeline (deduplication,
+ * Supabase insert, escalation, frontend feed) can be tested without a
+ * working API key or credit card on file.
+ * This flag must NEVER be set in production.
+ */
+function mockClassify(payload: Agent1Payload): TriageOutput {
+  const desc = payload.description.toLowerCase()
+  const isLifeRisk =
+    desc.includes('unconscious') ||
+    desc.includes('collapse') ||
+    desc.includes('fire') ||
+    desc.includes('cardiac') ||
+    desc.includes('dead') ||
+    desc.includes('death') ||
+    payload.people_affected >= 10
+
+  const isSevere =
+    desc.includes('injur') ||
+    desc.includes('bleed') ||
+    desc.includes('fracture') ||
+    desc.includes('crash') ||
+    desc.includes('collision') ||
+    payload.people_affected >= 5
+
+  const risk_level = isLifeRisk ? 1 : isSevere ? 2 : payload.people_affected >= 2 ? 3 : 4
+  const colorMap: Record<number, TriageOutput['risk_color']> = {
+    1: 'RED', 2: 'ORANGE', 3: 'YELLOW', 4: 'GREEN', 5: 'BLUE',
+  }
+
+  return {
+    title:      `[DEV] ${payload.description.split(' ').slice(0, 5).join(' ')}`,
+    risk_level,
+    risk_color: colorMap[risk_level],
+    reason:     `[DEV BYPASS] Mock classification based on keyword heuristics — not AI-generated.`,
+  }
+}
+
 // ── AI classification ─────────────────────────────────────────────────────────
 
 /**
@@ -94,6 +135,12 @@ export async function classifyEmergency(payload: Agent1Payload): Promise<{
   output: TriageOutput
   modelUsed: string
 }> {
+  // Dev bypass — skips AI Gateway for local testing
+  if (process.env.NEXT_PUBLIC_DEV_BYPASS_AI === 'true') {
+    console.log('[triage] DEV BYPASS active — using mock classification')
+    return { output: mockClassify(payload), modelUsed: 'mock/dev-bypass' }
+  }
+
   const context = [
     `Description: ${payload.description}`,
     `People affected: ${payload.people_affected}`,
