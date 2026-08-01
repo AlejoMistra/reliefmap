@@ -39,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background h-full">
+    <html lang="en" className="bg-background h-full" suppressHydrationWarning>
       <body className="antialiased h-full">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
