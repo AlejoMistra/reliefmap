@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import useSWR from "swr"
-import { AlertTriangle, Radio, ShieldAlert } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { AlertTriangle, Radio, ShieldAlert, LayoutDashboard, Boxes } from "lucide-react"
 import type { EmergencyReport } from "@/lib/triage/schema"
 
 const fetcher = (url: string) =>
@@ -11,8 +13,14 @@ const fetcher = (url: string) =>
     return r.json()
   })
 
+const NAV_ITEMS = [
+  { href: "/",         label: "Dashboard",  icon: LayoutDashboard },
+  { href: "/recursos", label: "Recursos",   icon: Boxes },
+]
+
 export function DashboardHeader() {
   const [now, setNow] = useState<Date | null>(null)
+  const pathname = usePathname()
 
   useEffect(() => {
     setNow(new Date())
@@ -63,6 +71,27 @@ export function DashboardHeader() {
           </p>
         </div>
       </div>
+
+      {/* Nav links */}
+      <nav className="flex items-center gap-1" aria-label="Navegación principal">
+        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-medium uppercase tracking-wider transition-colors ${
+                active
+                  ? "bg-em-accent/15 text-em-accent"
+                  : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {label}
+            </Link>
+          )
+        })}
+      </nav>
 
       {/* KPIs */}
       <div className="flex items-center gap-6">
