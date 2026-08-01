@@ -8,7 +8,7 @@ import {
   type TriageOutput,
 } from './schema'
 
-const MODEL = 'anthropic/claude-sonnet-4-5'
+const MODEL = 'google/gemini-2.5-flash-lite'
 
 // ── System prompt ────────────────────────────────────────────────────────────
 
