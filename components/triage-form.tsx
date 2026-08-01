@@ -27,16 +27,16 @@ const EMPTY_FORM: FormState = {
 }
 
 const SAMPLE: FormState = {
-  full_name: 'María López',
   dni: '28345671',
   description:
     'A bus collided with a car at high speed. Approximately 4 people are injured on the ground. One person appears unconscious and is not responding. There is fuel leaking from the bus.',
+  people_affected: '4',
+  full_name: 'María López',
   location_text: 'Calle Rivadavia 1450, Buenos Aires, near the intersection with Callao',
   latitude: '-34.6083',
   longitude: '-58.3901',
-  people_affected: '4',
   raw_transcript:
-    'Reporter: María López, DNI 28345671\nLocation: Calle Rivadavia 1450, Buenos Aires, near the intersection with Callao\nSituation: Bus hit a car. ~4 injured. One unconscious. Fuel leaking.\nTime: 14:32',
+    'Reporter: María López, DNI 28345671\nLocation: Calle Rivadavia 1450, Buenos Aires\nSituation: Bus hit a car. ~4 injured. One unconscious. Fuel leaking.\nTime: 14:32',
 }
 
 function Field({
@@ -75,23 +75,23 @@ export function TriageForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.description.trim()) return
+    if (!form.description.trim() || !form.dni.trim() || !form.people_affected.trim()) return
 
     setLoading(true)
     setResult(null)
     setError(null)
 
-    // Build the Agent1Payload — only send fields that have a value
+    // Build the Agent1Payload — required fields always sent, optional only when filled
     const payload: Record<string, unknown> = {
-      description: form.description.trim(),
+      dni:             form.dni.trim(),
+      description:     form.description.trim(),
+      people_affected: parseInt(form.people_affected, 10),
     }
-    if (form.full_name.trim())       payload.full_name       = form.full_name.trim()
-    if (form.dni.trim())             payload.dni             = form.dni.trim()
-    if (form.location_text.trim())   payload.location_text   = form.location_text.trim()
-    if (form.raw_transcript.trim())  payload.raw_transcript  = form.raw_transcript.trim()
-    if (form.latitude.trim())        payload.latitude        = parseFloat(form.latitude)
-    if (form.longitude.trim())       payload.longitude       = parseFloat(form.longitude)
-    if (form.people_affected.trim()) payload.people_affected = parseInt(form.people_affected, 10)
+    if (form.full_name.trim())      payload.full_name      = form.full_name.trim()
+    if (form.location_text.trim())  payload.location_text  = form.location_text.trim()
+    if (form.raw_transcript.trim()) payload.raw_transcript = form.raw_transcript.trim()
+    if (form.latitude.trim())       payload.latitude       = parseFloat(form.latitude)
+    if (form.longitude.trim())      payload.longitude      = parseFloat(form.longitude)
 
     try {
       const res = await fetch('/api/triage', {
@@ -122,7 +122,7 @@ export function TriageForm() {
         <div>
           <h2 className="text-base font-semibold">New Emergency Report</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Fields collected by Agent 1 (WhatsApp intake bot). The description is required — all other fields are optional.
+            Fields collected by Agent 1 (WhatsApp intake bot). DNI, description, and people affected are required — all other fields are supplementary.
           </p>
         </div>
         <button
@@ -135,40 +135,24 @@ export function TriageForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        {/* Reporter */}
+        {/* Required fields */}
         <fieldset className="flex flex-col gap-4">
           <legend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-            Reporter
+            Required
           </legend>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Full name">
-              <input
-                type="text"
-                value={form.full_name}
-                onChange={set('full_name')}
-                placeholder="e.g. María López"
-                className={inputClass}
-                disabled={loading}
-              />
-            </Field>
-            <Field label="DNI">
-              <input
-                type="text"
-                value={form.dni}
-                onChange={set('dni')}
-                placeholder="e.g. 28345671"
-                className={inputClass}
-                disabled={loading}
-              />
-            </Field>
-          </div>
-        </fieldset>
 
-        {/* Situation */}
-        <fieldset className="flex flex-col gap-4">
-          <legend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-            Situation
-          </legend>
+          <Field label="DNI" required>
+            <input
+              type="text"
+              value={form.dni}
+              onChange={set('dni')}
+              placeholder="e.g. 28345671"
+              className={inputClass}
+              disabled={loading}
+              required
+            />
+          </Field>
+
           <Field label="Description" required>
             <textarea
               value={form.description}
@@ -180,24 +164,38 @@ export function TriageForm() {
               required
             />
           </Field>
-          <Field label="People affected">
+
+          <Field label="People affected" required>
             <input
               type="number"
-              min={1}
+              min={0}
               value={form.people_affected}
               onChange={set('people_affected')}
               placeholder="e.g. 4"
               className={inputClass}
               disabled={loading}
+              required
             />
           </Field>
         </fieldset>
 
-        {/* Location */}
+        {/* Optional supplementary fields */}
         <fieldset className="flex flex-col gap-4">
           <legend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-            Location
+            Supplementary (optional)
           </legend>
+
+          <Field label="Full name">
+            <input
+              type="text"
+              value={form.full_name}
+              onChange={set('full_name')}
+              placeholder="e.g. María López"
+              className={inputClass}
+              disabled={loading}
+            />
+          </Field>
+
           <Field label="Address / landmark">
             <input
               type="text"
@@ -208,6 +206,7 @@ export function TriageForm() {
               disabled={loading}
             />
           </Field>
+
           <div className="grid grid-cols-2 gap-4">
             <Field label="Latitude">
               <input
@@ -232,13 +231,7 @@ export function TriageForm() {
               />
             </Field>
           </div>
-        </fieldset>
 
-        {/* Optional raw transcript */}
-        <fieldset className="flex flex-col gap-4">
-          <legend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-            Audit trail (optional)
-          </legend>
           <Field label="Raw transcript">
             <textarea
               value={form.raw_transcript}
@@ -253,7 +246,7 @@ export function TriageForm() {
 
         <button
           type="submit"
-          disabled={loading || !form.description.trim()}
+          disabled={loading || !form.description.trim() || !form.dni.trim() || !form.people_affected.trim()}
           className="self-start rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50 hover:opacity-90 transition-opacity"
         >
           {loading ? 'Classifying…' : 'Classify & Store Report'}

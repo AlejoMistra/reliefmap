@@ -31,15 +31,19 @@ export function ReportCard({ report }: Props) {
       {/* Reason */}
       <p className="text-sm text-muted-foreground leading-relaxed">{report.reason}</p>
 
-      {/* Details grid */}
+      {/* Required fields — always present */}
       <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+        <dt className="text-muted-foreground">DNI</dt>
+        <dd className="font-mono">{report.dni}</dd>
+
+        <dt className="text-muted-foreground">People affected</dt>
+        <dd>{report.people_affected}</dd>
+
+        {/* Optional supplementary fields */}
         {report.full_name && (
           <>
             <dt className="text-muted-foreground">Reporter</dt>
-            <dd>
-              {report.full_name}
-              {report.dni ? <span className="text-muted-foreground ml-1">({report.dni})</span> : null}
-            </dd>
+            <dd>{report.full_name}</dd>
           </>
         )}
 
@@ -59,25 +63,11 @@ export function ReportCard({ report }: Props) {
           </>
         )}
 
-        {report.people_affected != null && (
-          <>
-            <dt className="text-muted-foreground">People affected</dt>
-            <dd>{report.people_affected}</dd>
-          </>
-        )}
-
         <dt className="text-muted-foreground">Report ID</dt>
         <dd className="font-mono text-xs truncate">{report.id}</dd>
 
         <dt className="text-muted-foreground">Processed at</dt>
         <dd>{new Date(report.processed_at).toLocaleString()}</dd>
-
-        {report.model_used && (
-          <>
-            <dt className="text-muted-foreground">Model</dt>
-            <dd className="text-xs">{report.model_used}</dd>
-          </>
-        )}
       </dl>
     </article>
   )

@@ -9,20 +9,23 @@ export type RiskColor = z.infer<typeof RiskColor>
  * the triage processor never has to re-extract them from free text.
  */
 export const Agent1Payload = z.object({
+  // ── Required fields ─────────────────────────────────────────────────────────
+  /** National ID (DNI) of the reporter — mandatory for all reports */
+  dni: z.string().min(1, 'DNI is required'),
+  /** Free-text description of the emergency situation — mandatory */
+  description: z.string().min(1, 'description is required'),
+  /** Number of people affected — mandatory */
+  people_affected: z.number().int().min(0, 'people_affected must be 0 or more'),
+
+  // ── Optional supplementary fields ───────────────────────────────────────────
   /** Full name as stated by the reporter */
   full_name: z.string().min(1).optional(),
-  /** National ID (DNI) as stated by the reporter */
-  dni: z.string().optional(),
-  /** Free-text description of the emergency situation */
-  description: z.string().min(1, 'description is required'),
   /** Human-readable address or landmark provided by the reporter */
   location_text: z.string().optional(),
   /** GPS latitude if the WhatsApp bot captured the reporter's location pin */
   latitude: z.number().optional(),
   /** GPS longitude if the WhatsApp bot captured the reporter's location pin */
   longitude: z.number().optional(),
-  /** Number of people affected as reported by the caller */
-  people_affected: z.number().int().positive().optional(),
   /**
    * Optional: the full verbatim conversation transcript, stored for audit purposes.
    * If provided it is stored as-is but not re-analysed by the triage AI.
@@ -62,14 +65,15 @@ export interface EmergencyReport {
   id: string
   created_at: string
   processed_at: string
-  // Agent 1 fields
+  // Agent 1 fields — required
+  dni: string
+  people_affected: number
+  // Agent 1 fields — optional supplementary
   full_name: string | null
-  dni: string | null
   raw_transcript: string | null
   location_text: string | null
   latitude: number | null
   longitude: number | null
-  people_affected: number | null
   // AI-generated fields
   title: string
   risk_level: number
