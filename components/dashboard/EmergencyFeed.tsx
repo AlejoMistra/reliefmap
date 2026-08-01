@@ -91,8 +91,8 @@ export function EmergencyFeed() {
               {PRIORITY_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.value}
-                  className={`text-xs ${priorityFilter === opt.value ? "font-semibold" : ""}`}
-                  onSelect={() =>
+                  className={`text-xs ${priorityFilter === opt.value ? "font-semibold" : ""} cursor-pointer`}
+                  onClick={() =>
                     setPriorityFilter(
                       priorityFilter === opt.value ? null : opt.value
                     )
@@ -126,8 +126,8 @@ export function EmergencyFeed() {
               {STATUS_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.value}
-                  className={`text-xs ${statusFilter === opt.value ? "font-semibold" : ""}`}
-                  onSelect={() =>
+                  className={`text-xs ${statusFilter === opt.value ? "font-semibold" : ""} cursor-pointer`}
+                  onClick={() =>
                     setStatusFilter(
                       statusFilter === opt.value ? null : opt.value
                     )
