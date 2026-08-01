@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import useSWR from "swr"
-import { ListFilter, ChevronDown, X, RefreshCw } from "lucide-react"
+import { ListFilter, ChevronDown, X, RefreshCw, Zap } from "lucide-react"
 import { PRIORITY_ORDER, STATUS_LABELS } from "@/lib/emergencies"
 import type { Priority, Status } from "@/lib/emergencies"
 import { EmergencyCard } from "./EmergencyCard"
@@ -21,19 +21,22 @@ const COLOR_TO_PRIORITY: Record<RiskColor, Priority> = {
   ORANGE: "high",
   YELLOW: "medium",
   GREEN:  "low",
-  BLUE:   "low",
+  BLUE:   "info",
 }
 
 function reportToEmergency(r: EmergencyReport): Emergency {
   return {
-    id:            r.id,
-    title:         r.title,
-    location:      r.location_text,
-    description:   r.situation_summary ?? r.reason,
-    priority:      COLOR_TO_PRIORITY[r.risk_color],
+    id:             r.id,
+    title:          r.title,
+    location:       r.location_text,
+    description:    r.situation_summary ?? r.reason,
+    priority:       COLOR_TO_PRIORITY[r.risk_color],
+    triageLevel:    r.risk_level as 1 | 2 | 3 | 4 | 5,
+    reason:         r.reason,
     affectedPeople: r.people_affected,
-    reportedAt:    new Date(r.created_at),
-    status:        r.is_active ? "unassigned" : "resolved",
+    reportedAt:     new Date(r.created_at),
+    status:         r.is_active ? "unassigned" : "resolved",
+    formattedReport: r.situation_summary ?? undefined,
   }
 }
 
@@ -44,10 +47,11 @@ const fetcher = (url: string) =>
   })
 
 const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
-  { value: "critical", label: "Critico" },
-  { value: "high",     label: "Alto" },
-  { value: "medium",   label: "Medio" },
-  { value: "low",      label: "Bajo" },
+  { value: "critical", label: "Nivel 1 - ROJO" },
+  { value: "high",     label: "Nivel 2 - NARANJA" },
+  { value: "medium",   label: "Nivel 3 - AMARILLO" },
+  { value: "low",      label: "Nivel 4 - VERDE" },
+  { value: "info",     label: "Nivel 5 - AZUL" },
 ]
 
 const STATUS_OPTIONS: { value: Status; label: string }[] = [
@@ -67,6 +71,7 @@ export function EmergencyFeed() {
     high:     "ORANGE",
     medium:   "YELLOW",
     low:      "GREEN",
+    info:     "BLUE",
   }
 
   const apiUrl = priorityFilter
@@ -94,7 +99,11 @@ export function EmergencyFeed() {
 
   const filtered = [...emergencies]
     .filter((e) => (statusFilter ? e.status === statusFilter : true))
-    .sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
+    .sort((a, b) => {
+      const levelA = a.triageLevel || 3
+      const levelB = b.triageLevel || 3
+      return levelA - levelB
+    })
 
   const hasActiveFilters = priorityFilter !== null || statusFilter !== null
 
@@ -104,31 +113,39 @@ export function EmergencyFeed() {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-background">
       {/* Panel header */}
       <div className="flex flex-col gap-2 border-b border-border px-4 py-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ListFilter className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-semibold text-foreground">
-              Reportes Activos
+              Reportes Activos (Kapso + MCP)
             </span>
-            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+            <span className="rounded-full bg-red-500/15 text-red-400 border border-red-500/30 px-2 py-0.5 text-[10px] font-bold">
               {filtered.length}
             </span>
             {hasActiveFilters && (
-              <span className="rounded-full bg-em-accent/15 px-1.5 py-0.5 text-[10px] font-semibold text-em-accent border border-em-accent/30">
+              <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/30">
                 Filtrado
               </span>
             )}
           </div>
           <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+              <Zap className="h-3 w-3 animate-pulse" /> Live Feed
+            </span>
             {isValidating && !isLoading && (
               <RefreshCw className="h-3 w-3 text-muted-foreground animate-spin" />
             )}
-            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-              Por prioridad
-            </span>
+            <button
+              onClick={() => mutate()}
+              className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+              title="Refrescar feed"
+              aria-label="Actualizar reportes"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
 
@@ -200,15 +217,6 @@ export function EmergencyFeed() {
               Limpiar
             </button>
           )}
-
-          {/* Manual refresh */}
-          <button
-            className="ml-auto inline-flex h-7 items-center rounded-md px-2 text-muted-foreground hover:text-foreground transition-colors"
-            onClick={() => mutate()}
-            aria-label="Actualizar reportes"
-          >
-            <RefreshCw className="h-3 w-3" />
-          </button>
         </div>
       </div>
 
